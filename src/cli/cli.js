@@ -23,14 +23,14 @@ function askQuestion(prompt) {
 export async function startCLI() {
   const agent = new TravelAgent();
 
-  console.log('🌍 Travel Trip Planner Agent');
-  console.log('Type "exit" to quit | "reset" to start over\n');
+  console.log('Type "bye" to quit or "reset" to start over\n');
+  console.log('🌍 Lets plan your next trip!');
 
   while (true) {
     const userInput = await askQuestion('You: ');
 
     // Handle exit
-    if (userInput.toLowerCase() === 'exit') {
+    if (userInput.toLowerCase() === 'bye') {
       console.log('\n👋 Safe travels! Goodbye!\n');
       readlineInterface.close();
       break;
