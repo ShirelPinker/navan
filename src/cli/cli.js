@@ -6,20 +6,14 @@ const readlineInterface = readline.createInterface({
   output: process.stdout
 });
 
-/**
- * Prompt user for input
- * @param {string} prompt - The prompt to display
- * @returns {Promise<string>} - User's input
- */
+
 function askQuestion(prompt) {
   return new Promise((resolve) => {
     readlineInterface.question(prompt, resolve);
   });
 }
 
-/**
- * Start the CLI chat interface
- */
+
 export async function startCLI() {
   const agent = new TravelAgent();
 
@@ -29,14 +23,12 @@ export async function startCLI() {
   while (true) {
     const userInput = await askQuestion('You: ');
 
-    // Handle exit
     if (userInput.toLowerCase() === 'bye') {
       console.log('\n👋 Safe travels! Goodbye!\n');
       readlineInterface.close();
       break;
     }
 
-    // Handle reset
     if (userInput.toLowerCase() === 'reset') {
       agent.reset();
       console.log('\n🔄 Conversation reset. Let\'s start fresh!\n');
