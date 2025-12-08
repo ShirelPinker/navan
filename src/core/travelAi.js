@@ -1,9 +1,9 @@
 import { ContextMemory } from './contextMemory.js';
-import { sendMessage } from '../services/llmService.js';
+import * as llmService from '../services/llmService.js';
 import { SYSTEM_PROMPT } from '../prompts/systemPrompt.js';
 
 
-export class TravelAgent {
+export class TravelAi {
   constructor() {
     this.memory = new ContextMemory(SYSTEM_PROMPT);
   }
@@ -11,8 +11,8 @@ export class TravelAgent {
 
   async chat(userInput) {
     this.memory.addUserMessage(userInput);
-
-    const response = await sendMessage(this.memory.getMessages());
+    const availableTools = [] // add here the tools desc and name etc. i assume we would import them from a different file.
+    const response = await llmService.sendMessage(this.memory.getMessages());
 
     this.memory.addAssistantMessage(response);
 

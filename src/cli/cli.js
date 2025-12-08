@@ -1,5 +1,5 @@
 import readline from 'readline';
-import { TravelAgent } from '../core/travelAgent.js';
+import { TravelAi } from '../core/travelAi.js';
 
 const readlineInterface = readline.createInterface({
   input: process.stdin,
@@ -15,7 +15,7 @@ function askQuestion(prompt) {
 
 
 export async function startCLI() {
-  const agent = new TravelAgent();
+  const agent = new TravelAi();
 
   console.log('Type "bye" to quit or "reset" to start over\n');
   console.log('🌍 Lets plan your next trip!');
