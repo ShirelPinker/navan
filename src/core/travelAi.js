@@ -2,18 +2,21 @@ import { ContextMemory } from './contextMemory.js';
 import * as llmService from '../services/llmService.js';
 import { SYSTEM_PROMPT } from '../prompts/systemPrompt.js';
 import { weatherTool } from './tools/weatherTool.js';
-import { hotelTool, searchHotels } from './tools/hotelTool.js';
+import { flightsTool } from './tools/flightsTool.js';
 import { getWeather } from '../services/weatherService.js';
-const tools = [weatherTool, hotelTool];
+import { getFlights } from '../services/flightsService.js';
+const tools = [weatherTool, flightsTool];
 
 const functionMap = {
   getWeather,
-  searchHotels
+  getFlights
 };
 
 export class TravelAi {
   constructor() {
-    this.memory = new ContextMemory(SYSTEM_PROMPT);
+    const today = new Date().toISOString().split('T')[0];
+    const systemPromptWithDate = `${SYSTEM_PROMPT}\n\nCURRENT DATE: ${today}`;
+    this.memory = new ContextMemory(systemPromptWithDate);
   }
 
   async chat(userInput) {
