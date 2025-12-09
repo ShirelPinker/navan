@@ -18,13 +18,3 @@ export const weatherTool = {
   }
 };
 
-export async function getWeather(city) {
-  // TODO: Replace with actual weather API call
-  return { 
-    city,
-    forecast: "Sunny", 
-    temperature: 15,
-    unit: "celsius"
-  };
-}
-

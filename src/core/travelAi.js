@@ -1,9 +1,9 @@
 import { ContextMemory } from './contextMemory.js';
 import * as llmService from '../services/llmService.js';
 import { SYSTEM_PROMPT } from '../prompts/systemPrompt.js';
-import { weatherTool, getWeather } from './tools/weatherTool.js';
+import { weatherTool } from './tools/weatherTool.js';
 import { hotelTool, searchHotels } from './tools/hotelTool.js';
-
+import { getWeather } from '../services/weatherService.js';
 const tools = [weatherTool, hotelTool];
 
 const functionMap = {

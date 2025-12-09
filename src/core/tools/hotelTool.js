@@ -9,14 +9,6 @@ export const hotelTool = {
         city: { 
           type: "string",
           description: "The city to search hotels in"
-        },
-        checkIn: {
-          type: "string",
-          description: "Check-in date in YYYY-MM-DD format"
-        },
-        checkOut: {
-          type: "string",
-          description: "Check-out date in YYYY-MM-DD format"
         }
       },
       required: ["city"],
@@ -26,7 +18,7 @@ export const hotelTool = {
   }
 };
 
-export async function searchHotels(city, checkIn, checkOut) {
+export async function searchHotels(city) {
   // TODO: Replace with actual hotel API call
   return { 
     city,
