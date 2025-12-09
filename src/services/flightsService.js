@@ -1,38 +1,116 @@
-const API_KEY = process.env.AVIATIONSTACK_KEY;
+const API_KEY = process.env.AMADEUS_API_KEY;
+const API_SECRET = process.env.AMADEUS_API_SECRET;
 
-/**
- * Fetch flights between two airports (IATA codes)
- * Example: getFlights("TLV", "OSL")
- */
-export async function getFlights(depIata, arrIata, date = null) {
-  let url = `http://api.aviationstack.com/v1/flights?access_key=${API_KEY}&dep_iata=${depIata}&arr_iata=${arrIata}`;
+export async function getFlights(depIata, arrIata, date) {
+  try {
+    // 1) Get OAuth token
+    const token = await getAmadeusToken();
 
-  if (date) {
-    url += `&flight_date=${date}`;
+    // 2) Query the Amadeus Flight Offers API
+    const rawOffers = await searchAmadeusFlights(token, depIata, arrIata, date);
+
+    // 3) Normalize into a simple LLM-friendly structure
+    const flights = normalizeFlights(rawOffers);
+
+    return {
+      depIata,
+      arrIata,
+      date,
+      flights
+    };
+
+  } catch (err) {
+    console.error("❌ Amadeus Flights Error:", err.message);
+
+    return {
+      depIata,
+      arrIata,
+      date,
+      flights: [],
+      error: err.message
+    };
+  }
+}
+
+
+async function getAmadeusToken() {
+  const tokenUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
+
+  const params = new URLSearchParams();
+  params.append("grant_type", "client_credentials");
+  params.append("client_id", API_KEY);
+  params.append("client_secret", API_SECRET);
+
+  const res = await fetch(tokenUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params.toString()
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error("Failed to authenticate with Amadeus: " + text);
   }
 
-  const res = await fetch(url);
+  const data = await res.json();
+  return data.access_token;
+}
+
+async function searchAmadeusFlights(token, depIata, arrIata, date) {
+  const url = "https://test.api.amadeus.com/v2/shopping/flight-offers";
+
+  const body = {
+    currencyCode: "USD",
+    originDestinations: [
+      {
+        id: "1",
+        originLocationCode: depIata,
+        destinationLocationCode: arrIata,
+        departureDateTimeRange: { date }
+      }
+    ],
+    travelers: [{ id: "1", travelerType: "ADULT" }],
+    sources: ["GDS"]
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
   const data = await res.json();
 
-  if (!data.data || data.data.length === 0) {
-    return { flights: [] };
+  if (!res.ok) {
+    throw new Error(data?.errors?.[0]?.detail || "Flight search failed");
   }
 
-  // Simplify for the LLM
-  const flights = data.data.slice(0, 5).map(f => ({
-    airline: f.airline?.name,
-    flightNumber: f.flight?.iata,
-    departureAirport: f.departure?.airport,
-    arrivalAirport: f.arrival?.airport,
-    departureTime: f.departure?.scheduled,
-    arrivalTime: f.arrival?.scheduled,
-    status: f.flight_status
-  }));
+  return data.data || [];
+}
 
-  return {
-    depIata,
-    arrIata,
-    date,
-    flights
-  };
+
+function normalizeFlights(offers) {
+  if (!offers || offers.length === 0) return [];
+
+  return offers.slice(0, 5).map((offer) => {
+    const itinerary = offer.itineraries[0];
+    const firstSeg = itinerary.segments[0];
+    const lastSeg = itinerary.segments[itinerary.segments.length - 1];
+
+    return {
+      airline: firstSeg.carrierCode,
+      flightNumber: firstSeg.number,
+      departureAirport: firstSeg.departure.iataCode,
+      arrivalAirport: lastSeg.arrival.iataCode,
+      departureTime: firstSeg.departure.at,
+      arrivalTime: lastSeg.arrival.at,
+      duration: itinerary.duration,
+      price: offer.price?.total
+    };
+  });
 }

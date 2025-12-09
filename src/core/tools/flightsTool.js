@@ -17,7 +17,6 @@ export const flightsTool = {
         date: {
           type: "string",
           description: "Optional date in YYYY-MM-DD format",
-          nullable: true
         }
       },
       required: ["depIata", "arrIata", "date"],
