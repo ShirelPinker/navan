@@ -17,6 +17,9 @@ export class ContextMemory {
     this.messages.push({ role: 'assistant', content });
   }
 
+  addMessage(message) {
+    this.messages.push(message);
+  }
 
   getMessages() {
     return this.messages;

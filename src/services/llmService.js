@@ -9,12 +9,12 @@ const openai = new OpenAI({
 
 const DEFAULT_MODEL = 'gpt-4.1';
 
-export async function sendMessage(messages) {
+export async function sendMessage(messages, tools) {
   const completion = await openai.chat.completions.create({
-    DEFAULT_MODEL,
-    messages
+    model: DEFAULT_MODEL,
+    messages,
+    tools,
+    tool_choice: "auto"
   });
-
-  return completion.choices[0].message.content;
+  return completion.choices[0].message;
 }
-
