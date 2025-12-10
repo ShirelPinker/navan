@@ -109,13 +109,17 @@ Tool definitions with strict schemas ensure the LLM calls APIs correctly.
 
 ✈️  Planning...
 
-🗺️  Agent: Head to Prague for a magical Christmas market experience, charming old town, and romantic winter atmosphere. Would you like to go there? 
+🗺️  Agent: Head to Prague for a magical Christmas market experience,
+ charming old town, and romantic winter atmosphere.
+  Would you like to go there? 
 
 🌴 Traveler: What nice foods does Prague has to offer?
 
 ✈️  Planning...
 
-🗺️  Agent: Prague is famous for hearty dishes like roast pork with dumplings, trdelník (sweet pastry), mulled wine, and rich goulash. Would you like travel tips or an itinerary for Prague next weekend? 
+🗺️  Agent: Prague is famous for hearty dishes like roast pork with dumplings,
+ trdelník (sweet pastry), mulled wine, and rich goulash.
+  Would you like travel tips or an itinerary for Prague next weekend? 
 
 🌴 Traveler: Are there any available flights for Prague? are they expensive?
 
@@ -129,7 +133,9 @@ Tool definitions with strict schemas ensure the LLM calls APIs correctly.
 
 ➡️ Model called tool: getFlights { depIata: 'TLV', arrIata: 'PRG', date: '2025-12-13' } 
 
-🗺️  Agent: There are direct flights from Tel-Aviv to Prague next Saturday, with prices starting at $146.38 per person for a 4-hour trip. Want an itinerary for your romantic Prague weekend? 
+🗺️  Agent: There are direct flights from Tel-Aviv to Prague next Saturday,
+ with prices starting at $146.38 per person for a 4-hour trip.
+  Want an itinerary for your romantic Prague weekend? 
 
 🌴 Traveler: Will the weather be convinient for sightseeing?
 
@@ -137,7 +143,9 @@ Tool definitions with strict schemas ensure the LLM calls APIs correctly.
 
 ➡️ Model called tool: getWeather { city: 'Prague', date: '2025-12-13' } 
 
-🗺️  Agent: Prague will be chilly on December 13, with temperatures around 4–6°C and cloudy skies—nice for sightseeing and enjoying the festive atmosphere. Want some ideas for your weekend itinerary? 
+🗺️  Agent: Prague will be chilly on December 13,
+ with temperatures around 4–6°C and cloudy skies—nice for sightseeing and enjoying the festive atmosphere.
+ Want some ideas for your weekend itinerary? 
 
 🌴 Traveler: Yes give me some ideas why not
 
