@@ -7,7 +7,12 @@
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["travel", "trip-planner", "ai", "openai"],
+  "keywords": [
+    "travel",
+    "trip-planner",
+    "ai",
+    "openai"
+  ],
   "author": "",
   "license": "ISC",
   "description": "AI-powered Travel Trip Planner Agent",

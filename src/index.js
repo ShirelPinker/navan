@@ -1,3 +1,3 @@
-import { startCLI } from './cli/cli.js';
+import {startCLI} from './cli/cli.js';
 
 startCLI();

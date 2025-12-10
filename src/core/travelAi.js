@@ -1,47 +1,48 @@
-import { ContextMemory } from './contextMemory.js';
+import {ContextMemory} from './contextMemory.js';
 import * as llmService from '../services/llmService.js';
-import { SYSTEM_PROMPT } from '../prompts/systemPrompt.js';
-import { weatherTool } from './tools/weatherTool.js';
-import { flightsTool } from './tools/flightsTool.js';
-import { getWeather } from '../services/weatherService.js';
-import { getFlights } from '../services/flightsService.js';
+import {SYSTEM_PROMPT} from '../prompts/systemPrompt.js';
+import {weatherTool} from './tools/weatherTool.js';
+import {flightsTool} from './tools/flightsTool.js';
+import {getWeather} from '../services/weatherService.js';
+import {getFlights} from '../services/flightsService.js';
 
 const availableTools = [weatherTool, flightsTool];
 
 const toolFunctions = {
-  getWeather,
-  getFlights
+    getWeather,
+    getFlights
 };
 
 export class TravelAi {
-  MAX_ITERATIONS = 5;
-  constructor() {
-    const today = new Date().toISOString().split('T')[0];
-    const systemPromptWithDate = `${SYSTEM_PROMPT}\n\nCURRENT DATE: ${today}`;
-    this.memory = new ContextMemory(systemPromptWithDate);
-  }
+    MAX_ITERATIONS = 5;
 
-  async chat(userInput) {
-    this.memory.addUserMessage(userInput);
-    let iterations = 0;
-
-    while (true) {
-      iterations++
-      const response = await llmService.sendMessage(this.memory.getMessages(), availableTools);
-
-      if (this.shouldCallTool(response)) {
-          this.validateIterationsLimit(iterations);
-          this.memory.addMessage(response);
-
-        for (const toolCall of response.tool_calls) {
-            await this.executeTool(toolCall);
-        }
-      } else {
-          this.memory.addAssistantMessage(response.content);
-          return response.content;
-      }
+    constructor() {
+        const today = new Date().toISOString().split('T')[0];
+        const systemPromptWithDate = `${SYSTEM_PROMPT}\n\nCURRENT DATE: ${today}`;
+        this.memory = new ContextMemory(systemPromptWithDate);
     }
-  }
+
+    async chat(userInput) {
+        this.memory.addUserMessage(userInput);
+        let iterations = 0;
+
+        while (true) {
+            iterations++
+            const response = await llmService.sendMessage(this.memory.getMessages(), availableTools);
+
+            if (this.shouldCallTool(response)) {
+                this.validateIterationsLimit(iterations);
+                this.memory.addMessage(response);
+
+                for (const toolCall of response.tool_calls) {
+                    await this.executeTool(toolCall);
+                }
+            } else {
+                this.memory.addAssistantMessage(response.content);
+                return response.content;
+            }
+        }
+    }
 
     shouldCallTool(response) {
         return response.tool_calls && response.tool_calls.length > 0;
@@ -75,8 +76,8 @@ export class TravelAi {
             );
         }
     }
-    
+
     reset() {
-    this.memory.clear();
-  }
+        this.memory.clear();
+    }
 }
