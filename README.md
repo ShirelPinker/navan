@@ -1,93 +1,51 @@
 # Travel Trip Planner Agent
 
-An AI-powered conversational assistant that helps users plan trips by combining LLM intelligence with real-time flight and weather data.
+I have chosen to implement a Travel-Planner agent.
 
-## Setup
+The agent can answer a wide variety of question from its general knowledge and accompanies it with live data from two integrated tools:
+
+Flight tool and weather tool.
+
+## Implementation details
+
+### LLM
+For LLM I chose gpt-4.1, which is both not too expensive and also scores high on benchmarks of conversation and general knowledge.
+In addition - the JS SDK of OpenAi allows for built-in tool integration.
+
+### Tools
+I am using two free API's to pull live weather and flights data.
+
+### Context
+I have implemented an in-memory context mechanism that saves and enrich the context of the API call to the llm on each request.
+
+### Guardrails
+Added a loop-stopping mechanism to avoid long iterations and invested heavily in prompt engineering to allow for both safety and
+friendly/helpful conversations.
+
+### Prompt Engineering
+Provided clear and safe explanation for context, added a hidden chain-of-thought instruction to improve results.
+
+
+
+## Local Project Setup 
 
 ```bash
 npm install
 ```
 
-Create a `.env` file:
+Create a `.env` file, and add the next lines:
 ```
 OPENAI_API_KEY=your_key
 AMADEUS_API_KEY=your_key
 AMADEUS_API_SECRET=your_secret
 ```
 
-Run the CLI:
+I have supplied keys for all three in the e-mail.
+
+Run:
 ```bash
 npm start
 ```
-
----
-
-## Project Overview
-
-### 1. Conversation-Oriented Design
-
-**Three Task Types:**
-- **Flight Lookup** – Search real-time flights between airports
-- **Weather Lookup** – Get current weather or forecasts for any city
-- **Itinerary Creation** – Generate travel plans combining both data sources with LLM knowledge
-
-**Context & Continuity:**  
-The `ContextMemory` class maintains full conversation history, allowing the assistant to reference previous messages, reuse tool results, and handle follow-up questions naturally.
-
----
-
-### 2. Advanced Prompt Engineering
-
-**Chain-of-Thought Reasoning:**  
-The system prompt includes a hidden 7-step reasoning framework (THINK section) that guides the LLM.
-
-**Control Strategies:**
-- Explicit data source rules: "Always call getFlights for flight data, always call getWeather for weather data"
-- Response style constraints: short answers (3-4 sentences), single recommendations, max one clarifying question
-- Strict separation between API data (real-time) and LLM knowledge (general advice)
-
----
-
-### 3. External Data Integration
-
-**Two APIs:**
-
-| API | Purpose | Data Returned |
-|-----|---------|---------------|
-| **Amadeus** | Flight search | Airlines, prices, times, durations |
-| **Open-Meteo** | Weather | Temperature, conditions, forecasts |
-
-**Decision Logic:**  
-The system prompt explicitly instructs the LLM when to use each source:
-- APIs → Any time-sensitive data (flights, weather)
-- LLM → Itineraries, recommendations, cultural info, logistics
-
-Tool definitions with strict schemas ensure the LLM calls APIs correctly.
-
----
-
-### 4. Hallucination Detection & Management
-
-**Prevention:**
-- System prompt rules: "Never invent specific statistics, times, prices, or conditions"
-- Mandatory tool usage for real-time data
-- "If a tool returns nothing, say: I couldn't find that information"
-
-**Detection & Recovery:**
-- Pre-response verification step in the reasoning chain
-- Self-correction instruction: "If a mistake is made, briefly correct it"
-- Max iteration limit (5) prevents infinite tool-calling loops
-
----
-
-### 5. Technical Implementation
-
-- **Language:** JavaScript (Node.js)
-- **LLM:** I chose to use OpenAI GPT-4.1 since it supports tool use, excels at following complex instructions and has relatively low cost.
-- **Interface:** CLI with conversation reset and exit commands
-
-
----
 
 
 ## Example Conversation
