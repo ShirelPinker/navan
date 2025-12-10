@@ -2,22 +2,22 @@ import * as readline from 'readline/promises';
 import { TravelAi } from '../core/travelAi.js';
 
 export async function startCLI() {
-  const rl = readline.createInterface({
+  const cli = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
 
   const agent = new TravelAi();
 
-  console.log('Type "bye" to quit or "reset" to start over\n');
   console.log('🌍 Lets plan your next trip!');
+  console.log('(Type "bye" to quit or "reset" to start over)\n');
 
   while (true) {
-    const userInput = await rl.question('🌴 Traveler: ');
+    const userInput = await cli.question('🌴 Traveler: ');
 
     if (userInput.toLowerCase() === 'bye') {
       console.log('\n👋 Safe travels! Goodbye!\n');
-      rl.close();
+      cli.close();
       break;
     }
 

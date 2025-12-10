@@ -5,14 +5,16 @@ import { weatherTool } from './tools/weatherTool.js';
 import { flightsTool } from './tools/flightsTool.js';
 import { getWeather } from '../services/weatherService.js';
 import { getFlights } from '../services/flightsService.js';
-const tools = [weatherTool, flightsTool];
 
-const functionMap = {
+const availableTools = [weatherTool, flightsTool];
+
+const toolFunctions = {
   getWeather,
   getFlights
 };
 
 export class TravelAi {
+  MAX_ITERATIONS = 5;
   constructor() {
     const today = new Date().toISOString().split('T')[0];
     const systemPromptWithDate = `${SYSTEM_PROMPT}\n\nCURRENT DATE: ${today}`;
@@ -21,54 +23,60 @@ export class TravelAi {
 
   async chat(userInput) {
     this.memory.addUserMessage(userInput);
-    const MAX_ITERATIONS = 5;
     let iterations = 0;
 
     while (true) {
       iterations++
-      const response = await llmService.sendMessage(this.memory.getMessages(), tools);
+      const response = await llmService.sendMessage(this.memory.getMessages(), availableTools);
 
-      if (response.tool_calls && response.tool_calls.length > 0) {
-        if (iterations > MAX_ITERATIONS) {
-          console.error("llm exceeded max iteration");
-          throw new Error("Looks like something went wrong.. Please contact our support or try again later");
-        }
-        if (iterations === MAX_ITERATIONS) {
-          this.memory.addUserMessage(
-            "This is your last chance to use tools. After this, please provide a final answer."
-          );
-        }
-        this.memory.addMessage(response);
+      if (this.shouldCallTool(response)) {
+          this.validateIterationsLimit(iterations);
+          this.memory.addMessage(response);
 
         for (const toolCall of response.tool_calls) {
-          const { name, arguments: argsJSON } = toolCall.function;
-          const args = JSON.parse(argsJSON);
-
-          console.log("➡️ Model called tool:", name, args);
-
-          const fn = functionMap[name];
-          const result = await fn(...Object.values(args));
-
-          this.memory.addMessage({
-            role: "tool",
-            tool_call_id: toolCall.id,
-            content: JSON.stringify(result)
-          });
+            await this.executeTool(toolCall);
         }
-
-        continue;
+      } else {
+          this.memory.addAssistantMessage(response.content);
+          return response.content;
       }
-
-      this.memory.addAssistantMessage(response.content);
-      return response.content;
     }
   }
 
-  reset() {
-    this.memory.clear();
-  }
+    shouldCallTool(response) {
+        return response.tool_calls && response.tool_calls.length > 0;
+    }
 
-  getConversationLength() {
-    return this.memory.getMessageCount();
+    async executeTool(toolCall) {
+        const toolName = toolCall.function.name
+        const toolArguments = JSON.parse(toolCall.function.arguments)
+
+        console.log("➡️ Model called tool:", toolName, toolArguments);
+
+        const toolFunction = toolFunctions[toolName];
+        const toolResult = await toolFunction(...Object.values(toolArguments));
+
+        this.memory.addMessage({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(toolResult)
+        });
+    }
+
+    validateIterationsLimit(iterations) {
+        if (iterations > this.MAX_ITERATIONS) {
+            console.error("llm exceeded max iteration");
+            throw new Error("Looks like something went wrong.. Please contact our support or try again later");
+        }
+
+        if (iterations === this.MAX_ITERATIONS) {
+            this.memory.addUserMessage(
+                "This is your last chance to use tools. After this, please provide a final answer."
+            );
+        }
+    }
+    
+    reset() {
+    this.memory.clear();
   }
 }
