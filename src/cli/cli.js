@@ -27,15 +27,12 @@ export async function startCLI() {
             continue;
         }
 
-        console.log('\n✈️  Planning...\n');
-
         try {
+            console.log('\n✈️  Planning...\n');
             const response = await agent.chat(userInput);
-            console.log('🗺️  Agent:', response);
-            console.log();
+            console.log('🗺️  Agent:', response, '\n');
         } catch (error) {
-            console.error('❌ Error:', error.message);
-            console.log();
+            console.error('❌ Error:', error.message, '\n');
         }
     }
 }

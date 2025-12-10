@@ -22,14 +22,14 @@ export class TravelAi {
 
     async chat(userInput) {
         this.memory.addUserMessage(userInput);
-        let iterations = 0;
+        let iterationsCount = 0;
 
         while (true) {
-            iterations++
+            iterationsCount++
             const response = await llmService.sendMessage(this.memory.getMessages(), availableTools);
 
             if (this.shouldCallTool(response)) {
-               this.handleToolCalls(response);
+               await this.handleToolCalls(response, iterationsCount);
             } else {
                 this.memory.addAssistantMessage(response.content);
                 return response.content;
@@ -40,14 +40,27 @@ export class TravelAi {
     shouldCallTool(response) {
         return response.tool_calls && response.tool_calls.length > 0;
     }
-    
-    async handleToolCalls(response) {
-      this.validateIterationsLimit(iterations);
+
+    async handleToolCalls(response, iterationsCount) {
+      this.validateIterationsLimit(iterationsCount);
       this.memory.addMessage(response);
 
       for (const toolCall of response.tool_calls) {
           await this.executeTool(toolCall);
       }
+    }
+
+    validateIterationsLimit(iterationsCount) {
+        if (iterationsCount > this.MAX_ITERATIONS) {
+            console.error("llm exceeded max iteration");
+            throw new Error("Looks like something went wrong.. Please contact our support or try again later");
+        }
+
+        if (iterationsCount === this.MAX_ITERATIONS) {
+            this.memory.addUserMessage(
+                "This is your last chance to use tools. After this, please provide a final answer."
+            );
+        }
     }
 
     async executeTool(toolCall) {
@@ -64,19 +77,6 @@ export class TravelAi {
             tool_call_id: toolCall.id,
             content: JSON.stringify(toolResult)
         });
-    }
-
-    validateIterationsLimit(iterations) {
-        if (iterations > this.MAX_ITERATIONS) {
-            console.error("llm exceeded max iteration");
-            throw new Error("Looks like something went wrong.. Please contact our support or try again later");
-        }
-
-        if (iterations === this.MAX_ITERATIONS) {
-            this.memory.addUserMessage(
-                "This is your last chance to use tools. After this, please provide a final answer."
-            );
-        }
     }
 
     reset() {

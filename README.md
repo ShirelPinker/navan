@@ -83,7 +83,7 @@ Tool definitions with strict schemas ensure the LLM calls APIs correctly.
 ### 5. Technical Implementation
 
 - **Language:** JavaScript (Node.js)
-- **LLM:** I chose to use OpenAI GPT-4.1 since it supports tool use and excels at following complex instructions
+- **LLM:** I chose to use OpenAI GPT-4.1 since it supports tool use, excels at following complex instructions and has relatively low cost.
 - **Interface:** CLI with conversation reset and exit commands
 
 
