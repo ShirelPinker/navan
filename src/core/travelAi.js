@@ -23,12 +23,12 @@ export class TravelAi {
     this.memory.addUserMessage(userInput);
 
     while (true) {
-      const msg = await llmService.sendMessage(this.memory.getMessages(), tools);
+      const response = await llmService.sendMessage(this.memory.getMessages(), tools);
 
-      if (msg.tool_calls && msg.tool_calls.length > 0) {
-        this.memory.addMessage(msg);
+      if (response.tool_calls && response.tool_calls.length > 0) {
+        this.memory.addMessage(response);
 
-        for (const toolCall of msg.tool_calls) {
+        for (const toolCall of response.tool_calls) {
           const { name, arguments: argsJSON } = toolCall.function;
           const args = JSON.parse(argsJSON);
 
@@ -47,8 +47,8 @@ export class TravelAi {
         continue;
       }
 
-      this.memory.addAssistantMessage(msg.content);
-      return msg.content;
+      this.memory.addAssistantMessage(response.content);
+      return response.content;
     }
   }
 

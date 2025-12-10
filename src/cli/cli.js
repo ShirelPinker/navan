@@ -13,7 +13,7 @@ export async function startCLI() {
   console.log('🌍 Lets plan your next trip!');
 
   while (true) {
-    const userInput = await rl.question('You: ');
+    const userInput = await rl.question('🌴 Traveler: ');
 
     if (userInput.toLowerCase() === 'bye') {
       console.log('\n👋 Safe travels! Goodbye!\n');
