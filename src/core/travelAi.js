@@ -17,9 +17,7 @@ export class TravelAi {
     MAX_ITERATIONS = 5;
 
     constructor() {
-        const today = new Date().toISOString().split('T')[0];
-        const systemPromptWithDate = `${SYSTEM_PROMPT}\n\nCURRENT DATE: ${today}`;
-        this.memory = new ContextMemory(systemPromptWithDate);
+        this.memory = new ContextMemory(SYSTEM_PROMPT);
     }
 
     async chat(userInput) {
@@ -31,12 +29,7 @@ export class TravelAi {
             const response = await llmService.sendMessage(this.memory.getMessages(), availableTools);
 
             if (this.shouldCallTool(response)) {
-                this.validateIterationsLimit(iterations);
-                this.memory.addMessage(response);
-
-                for (const toolCall of response.tool_calls) {
-                    await this.executeTool(toolCall);
-                }
+               this.handleToolCalls(response);
             } else {
                 this.memory.addAssistantMessage(response.content);
                 return response.content;
@@ -46,6 +39,15 @@ export class TravelAi {
 
     shouldCallTool(response) {
         return response.tool_calls && response.tool_calls.length > 0;
+    }
+    
+    async handleToolCalls(response) {
+      this.validateIterationsLimit(iterations);
+      this.memory.addMessage(response);
+
+      for (const toolCall of response.tool_calls) {
+          await this.executeTool(toolCall);
+      }
     }
 
     async executeTool(toolCall) {
