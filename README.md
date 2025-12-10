@@ -1,4 +1,4 @@
-# ✈️ Travel Trip Planner Agent
+# Travel Trip Planner Agent
 
 An AI-powered conversational assistant that helps users plan trips by combining LLM intelligence with real-time flight and weather data.
 

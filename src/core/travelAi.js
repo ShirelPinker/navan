@@ -67,7 +67,7 @@ export class TravelAi {
         const toolName = toolCall.function.name
         const toolArguments = JSON.parse(toolCall.function.arguments)
 
-        console.log("➡️ Model called tool:", toolName, toolArguments);
+        console.log("➡️ Model called tool:", toolName, toolArguments, "\n");
 
         const toolFunction = toolFunctions[toolName];
         const toolResult = await toolFunction(...Object.values(toolArguments));

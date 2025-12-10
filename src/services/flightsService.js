@@ -5,7 +5,7 @@ export async function getFlights(depIata, arrIata, date) {
     try {
         const token = await getAmadeusToken();
         const rawOffers = await searchAmadeusFlights(token, depIata, arrIata, date);
-        const flights = normalizeFlights(rawOffers);
+        const flights = formatFlightsResponse(rawOffers);
         return {
             depIata,
             arrIata,
@@ -83,23 +83,25 @@ async function searchAmadeusFlights(token, depIata, arrIata, date) {
 }
 
 
-function normalizeFlights(offers) {
+function formatFlightsResponse(offers) {
     if (!offers || offers.length === 0) return [];
+    const firstFiveOffers = offers.slice(0, 5);
+    return firstFiveOffers.map(normalizeOffer);
+}
 
-    return offers.slice(0, 5).map((offer) => {
-        const itinerary = offer.itineraries[0];
-        const firstSeg = itinerary.segments[0];
-        const lastSeg = itinerary.segments[itinerary.segments.length - 1];
+function normalizeOffer(offer) {
+    const itinerary = offer.itineraries[0];
+    const firstSeg = itinerary.segments[0];
+    const lastSeg = itinerary.segments[itinerary.segments.length - 1];
 
-        return {
-            airline: firstSeg.carrierCode,
-            flightNumber: firstSeg.number,
-            departureAirport: firstSeg.departure.iataCode,
-            arrivalAirport: lastSeg.arrival.iataCode,
-            departureTime: firstSeg.departure.at,
-            arrivalTime: lastSeg.arrival.at,
-            duration: itinerary.duration,
-            price: offer.price?.total
-        };
-    });
+    return {
+        airline: firstSeg.carrierCode,
+        flightNumber: firstSeg.number,
+        departureAirport: firstSeg.departure.iataCode,
+        arrivalAirport: lastSeg.arrival.iataCode,
+        departureTime: firstSeg.departure.at,
+        arrivalTime: lastSeg.arrival.at,
+        duration: itinerary.duration,
+        price: offer.price?.total
+    };
 }
