@@ -11,7 +11,7 @@ export const weatherTool = {
                     description: "The city name to get weather for"
                 },
                 date: {
-                    type: ["string", "null"],
+                    anyOf: [{ type: "string" }, { type: "null" }],
                     description: "Optional date for forecast in YYYY-MM-DD format. If not provided or null, returns current weather."
                 }
             },

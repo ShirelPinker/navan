@@ -9,7 +9,7 @@ Flight tool and weather tool.
 ## Implementation details
 
 ### LLM
-For LLM I chose gpt-4.1, which is both not too expensive and also scores high on benchmarks of conversation and general knowledge.
+For LLM I chose gpt-o1, which is a strong reasoning model that scores high on benchmarks of conversation and general knowledge.
 In addition - the JS SDK of OpenAi allows for built-in tool integration.
 
 ### Tools
@@ -24,7 +24,6 @@ friendly/helpful conversations.
 
 ### Prompt Engineering
 Provided clear and safe explanation for context, added a hidden chain-of-thought instruction to improve results.
-
 
 
 ## Local Project Setup 

@@ -22,7 +22,7 @@ export class ContextMemory {
     }
 
     clear() {
-        this.messages = [this.systemPrompt]
+        this.messages = [{role: 'system', content: this.systemPrompt}];
     }
 }
 
