@@ -22,7 +22,7 @@ npm start
 
 ---
 
-## Assignment Requirements
+## Project Overview
 
 ### 1. Conversation-Oriented Design
 
