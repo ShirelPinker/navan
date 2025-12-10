@@ -3,13 +3,10 @@ const API_SECRET = process.env.AMADEUS_API_SECRET;
 
 export async function getFlights(depIata, arrIata, date) {
   try {
-    // 1) Get OAuth token
     const token = await getAmadeusToken();
 
-    // 2) Query the Amadeus Flight Offers API
     const rawOffers = await searchAmadeusFlights(token, depIata, arrIata, date);
 
-    // 3) Normalize into a simple LLM-friendly structure
     const flights = normalizeFlights(rawOffers);
 
     return {

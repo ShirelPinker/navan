@@ -21,11 +21,19 @@ export class TravelAi {
 
   async chat(userInput) {
     this.memory.addUserMessage(userInput);
+    const MAX_ITERATIONS = 10;
+    let iterations = 0;
 
     while (true) {
       const response = await llmService.sendMessage(this.memory.getMessages(), tools);
 
       if (response.tool_calls && response.tool_calls.length > 0) {
+        if (++iterations >= MAX_ITERATIONS) {
+          this.memory.addUserMessage(
+            "You have used too many tool calls. Please conclude and provide a final answer based on the information you have gathered so far."
+          );
+          continue;
+        }
         this.memory.addMessage(response);
 
         for (const toolCall of response.tool_calls) {
